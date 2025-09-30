@@ -21,11 +21,6 @@ final class PageController extends AbstractController
     #[Route('/', name: 'inicio')]
     public function inicio(): Response
     {
-        return new Response("Bienvenido a mi página");
-    }
-    #[Route('/contacto/{codigo}', name: 'fichas')]
-    public function contacto(): Response
-    {
-        return new Response("Bienvenido a mi página.");
+        return $this->render('inicio.html.twig');
     }
 }
