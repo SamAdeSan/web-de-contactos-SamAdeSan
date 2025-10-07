@@ -13,10 +13,14 @@ class Contacto
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Provincia $provincia = null;
+
     #[ORM\Column(length: 255)]
     private ?string $nombre = null;
 
-    #[ORM\Column(length: 15)]
+    #[ORM\Column(length: 255)]
     private ?string $telefono = null;
 
     #[ORM\Column(length: 255)]
@@ -25,6 +29,18 @@ class Contacto
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getProvincia(): ?Provincia
+    {
+        return $this->provincia;
+    }
+
+    public function setProvincia(?Provincia $provincia): static
+    {
+        $this->provincia = $provincia;
+
+        return $this;
     }
 
     public function getNombre(): ?string
@@ -61,10 +77,5 @@ class Contacto
         $this->email = $email;
 
         return $this;
-    }
-
-    public function getRandom(): int
-    {
-        return rand(1,10);
     }
 }
