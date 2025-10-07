@@ -93,9 +93,10 @@ final class ContactoController extends AbstractController
     public function insertarConProvincia(ManagerRegistry $doctrine): Response
     {
         $entityManager = $doctrine->getManager();
-        $provincia = new Provincia();
+        $repositorio = $doctrine->getRepository(Provincia::class);
 
-        $provincia->setNombre("Castellón");
+        $provincia = $repositorio->findOneBy(["nombre" => "Castellón"]);
+
         $contacto = new Contacto();
 
         $contacto->setNombre("Inserción de prueba con provincia.");
@@ -103,8 +104,10 @@ final class ContactoController extends AbstractController
         $contacto->setEmail("insercion.de.prueba.de.conatcto@contacto.es");
         $contacto->setProvincia($provincia);
 
-        $entityManager->persist($provincia);
         $entityManager->persist($contacto);
+
+        $entityManager->flush();
+        return $this->render('lista_contactos.html.twig', ['contactos' => $contacto]);
     }
 
     #[Route('/contacto/{codigo?1}', name: 'ficha_contacto')]
