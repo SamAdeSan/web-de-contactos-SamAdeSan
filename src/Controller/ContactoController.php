@@ -34,12 +34,17 @@ final class ContactoController extends AbstractController
     #[Route('/contacto/insertar', name: 'insertar_contacto')]
     public function insertar(ManagerRegistry $doctrine)
     {
+        $repositorio = $doctrine->getRepository(Provincia::class);
+
+        $castellon = $repositorio->find(1);
         $entityManager = $doctrine->getManager();
         foreach ($this->contactos as $c) {
             $contacto = new Contacto();
             $contacto->setNombre($c["nombre"]);
             $contacto->setTelefono($c["telefono"]);
             $contacto->setEmail($c["email"]);
+            $contacto->setProvincia($castellon);
+
             $entityManager->persist($contacto);
         }
 
@@ -47,7 +52,7 @@ final class ContactoController extends AbstractController
             $entityManager->flush();
             return new Response("Contactos insertados correctamente");
         } catch (\Exception $e) {
-            return new Response("Error al insertar contacto");
+            return new Response("Error al insertar contacto " . $e->getMessage());
         }
     }
 
@@ -188,7 +193,6 @@ final class ContactoController extends AbstractController
         $repositorio = $doctrine->getRepository(Contacto::class);
         $contacto = $repositorio->find($codigo);
         
-
         if ($contacto) {
             return $this->render('ficha_contacto.html.twig', ["contacto" => $contacto]);
         }
