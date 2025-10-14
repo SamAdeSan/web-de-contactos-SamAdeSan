@@ -8,9 +8,15 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Form\ContactoFormType as ContactoType;
+use Symfony\Component\HttpFoundation\Request;
 
 final class ContactoController extends AbstractController
 {
+    /**
+     * Array de contactos.
+     */
+
     private $contactos = [
         1 => ["nombre" => "Juan Pérez", "telefono" => "524142432", "email" => "juanp@ieselcaminas.org"],
         2 => ["nombre" => "Ana López", "telefono" => "58958448", "email" => "anita@ieselcaminas.org"],
@@ -18,6 +24,13 @@ final class ContactoController extends AbstractController
         7 => ["nombre" => "Laura Martínez", "telefono" => "42898966", "email" => "lm2000@ieselcaminas.org"],
         9 => ["nombre" => "Nora Jover", "telefono" => "54565859", "email" => "norajover@ieselcaminas.org"]
     ];
+
+    /**
+     * @Route("/contacto/insertar", name="insertar_contacto")
+     * 
+     * La función inserta varios contactos en la base de datos.
+     */
+
     #[Route('/contacto/insertar', name: 'insertar_contacto')]
     public function insertar(ManagerRegistry $doctrine)
     {
@@ -38,6 +51,12 @@ final class ContactoController extends AbstractController
         }
     }
 
+    /**
+     * @Route("/contacto/buscar/{texto}", name="buscar_contacto")
+     * 
+     * La función busca contactos por nombre.
+     */
+
     #[Route('/contacto/buscar/{texto}', name: 'buscar_contacto')]
     public function buscar(ManagerRegistry $doctrine, $texto): Response
     {
@@ -48,6 +67,12 @@ final class ContactoController extends AbstractController
             'contactos' => $contactos
         ]);
     }
+
+    /**
+     * @Route("/contacto/update/{id}/{nombre}", name="modificar_contacto")
+     * 
+     * La función modifica el nombre de un contacto.
+     */
 
     #[Route('/contacto/update/{id}/{nombre}', name: 'modificar_contacto')]
     public function update(ManagerRegistry $doctrine, $id, $nombre): Response
@@ -69,6 +94,12 @@ final class ContactoController extends AbstractController
         }
     }
 
+    /**
+     * @Route("/contacto/delete/{id}", name="eliminar_contacto")
+     * 
+     * La función elimina un contacto.
+     */
+
     #[Route('/contacto/delete/{id}', name: 'eliminar_contacto')]
     public function delete(ManagerRegistry $doctrine, $id): Response
     {
@@ -88,6 +119,12 @@ final class ContactoController extends AbstractController
             return $this->render('ficha_contacto.html.twig', ['contacto' == null]);
         }
     }
+
+    /**
+     * @Route("/contacto/insertarConProvincia", name="insertar_con_provincia_contacto")
+     * 
+     * La función inserta un contacto con provincia.
+     */
 
     #[Route('/contacto/insertarConProvincia', name: 'insertar_con_provincia_contacto')]
     public function insertarConProvincia(ManagerRegistry $doctrine): Response
@@ -110,6 +147,42 @@ final class ContactoController extends AbstractController
         return $this->render('lista_contactos.html.twig', ['contactos' => $contacto]);
     }
 
+    /**
+     * @Route("/contacto/nuevo", name="nuevo")
+     * Method({"GET", "POST"})
+     * 
+     * La función crea un contacto nuevo mediante un formulario.
+     */
+
+    #[Route('/contacto/nuevo', name: 'nuevo')]
+    public function nuevo(ManagerRegistry $doctrine, Request $request) {
+
+        $contacto = new Contacto();
+        $formulario = $this->createForm(ContactoType::class, $contacto);
+        $formulario->handleRequest($request);
+
+        if ($formulario->isSubmitted() && $formulario->isValid()) {
+
+            $contacto = $formulario->getData();
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($contacto);
+            $entityManager->flush();
+            
+            return $this->redirectToRoute('ficha_contacto', ["codigo" => $contacto->getId()]);
+        }
+
+        return $this->render('nuevo.html.twig', array(
+            'formulario' => $formulario->createView()
+        ));
+
+    }
+
+    /**
+     * @Route("/contacto/{codigo?1}", name="ficha_contacto")
+     * 
+     * La función muestra la ficha de un contacto.
+     */
+
     #[Route('/contacto/{codigo?1}', name: 'ficha_contacto')]
     public function ficha(ManagerRegistry $doctrine, $codigo): Response {
         $repositorio = $doctrine->getRepository(Contacto::class);
@@ -121,5 +194,4 @@ final class ContactoController extends AbstractController
         }
         return new Response("<html lang='en'><body>Contacto $codigo no encontrado</body></html>");
     }
-
 }
