@@ -9,6 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 
 
 class ContactoFormType extends AbstractType
@@ -16,9 +17,9 @@ class ContactoFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nombre')
-            ->add('telefono')
-            ->add('email')
+            ->add('nombre', null, array('label' => 'Nombre completo ')  )
+            ->add('telefono', null, array('label' => 'Teléfono '))
+            ->add('email', EmailType::class, array('label' => 'Correo electrónico '))
             ->add('provincia', EntityType::class, [
                 'class' => Provincia::class,
                 'choice_label' => 'nombre',
