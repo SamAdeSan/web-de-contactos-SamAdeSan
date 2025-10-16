@@ -37,11 +37,6 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
-        # matches /admin/users/*
-        - { path: '^/admin/users', roles: ROLE_SUPER_ADMIN }
-
-        # matches /admin/* except for anything matching the above rule
-        - { path: '^/admin', roles: ROLE_ADMIN }
 
 when@test:
     security:
