@@ -1,5 +1,5 @@
 # Mi web de contactos - Samuel Aded
-Aplicación de agenda de contactos con Symfony
+¡Hola! Bienvenido a mi web de contactos. En esta web verás todo lo que he implementado en el segundo apartado de el profesor Victor Ponz. [Más aquí](https://victorponz.github.io/symfony-contactos-teoria/)
 ### Instalación de las carpetas `/var` y `/vendor` (*composer*)
 Para instalar composer hay que ejecutar este comando:
 ```
