@@ -5,6 +5,17 @@
 <h1>Ficha del contacto</h1>
 {% if contacto %}
     {{ include ('datos_contacto.html.twig', {'contacto': contacto}) }}
+    <h2>{{ contacto.nombre }}</h2>
+    <p>Email: {{ contacto.email }}</p>
+    <p>Teléfono: {{ contacto.telefono }}</p>
+
+    <form method="post">
+        <button type="submit" name="accion" value="editar">Editar</button>
+        <button type="submit" name="accion" value="borrar">Borrar</button>
+    </form>
+
+    <a href="{{ path('app_index') }}">Volver a la lista</a>
+
 {% else %}
 <p>Contacto no encontrado</p>
 {% endif %}
