@@ -227,7 +227,8 @@ final class ContactoController extends AbstractController
     public function ficha(ManagerRegistry $doctrine, $codigo): Response {
         $repositorio = $doctrine->getRepository(Contacto::class);
         $contacto = $repositorio->find($codigo);
-        
+
+
         if ($contacto) {
             return $this->render('ficha_contacto.html.twig', ["contacto" => $contacto]);
         }

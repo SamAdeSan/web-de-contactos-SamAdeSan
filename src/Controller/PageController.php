@@ -13,24 +13,35 @@ use App\Form\ContactoFormType as ContactoType;
 
 final class PageController extends AbstractController
 {
-    #[Route('/page', name: 'app_page')]
-    public function index(): JsonResponse
+    #[Route('/', name: 'index')]
+    public function index(ManagerRegistry $doctrine): Response
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/PageController.php',
-        ]);
-    }
-    #[Route('/{codigo?1}', name: 'inicio')]
-    public function ficha(ManagerRegistry $doctrine, $codigo, Request $request): Response
-    {
-        $em = $doctrine->getManager();
-
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY'); // login check
-
         $repositorio = $doctrine->getRepository(Contacto::class);
-        $contacto = $repositorio->find($codigo);
+        $contactos = $repositorio->findAll();
 
+        return $this->render('inicio.html.twig', [
+            'contactos' => $contactos
+        ]);
+        
+    }
+    #[Route('/contacto/{codigo?1}', name: 'ficha')]
+    public function ficha(ManagerRegistry $doctrine, Request $request, $codigo = null): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER'); // Comprobar login
+
+        $em = $doctrine->getManager();
+        $repositorio = $doctrine->getRepository(Contacto::class);
+
+        // Si no hay código, mostramos la lista de contactos
+        if ($codigo === null) {
+            $contactos = $repositorio->findAll();
+            return $this->render('inicio.html.twig', [
+                'contactos' => $contactos
+            ]);
+        }
+
+        // Si hay código, mostramos la ficha del contacto
+        $contacto = $repositorio->find($codigo);
         if (!$contacto) {
             throw $this->createNotFoundException("Contacto $codigo no encontrado");
         }
@@ -40,13 +51,11 @@ final class PageController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             if ($form->get('guardar')->isClicked()) {
-                $em = $doctrine->getManager();
                 $em->flush();
-            } else if ($form->get('borrar')->isClicked()) {
-                $em = $doctrine->getManager();
+            } elseif ($form->get('borrar')->isClicked()) {
                 $em->remove($contacto);
                 $em->flush();
-                return $this->redirectToRoute('portada');
+                return $this->redirectToRoute('inicio');
             }
         }
 
@@ -55,6 +64,4 @@ final class PageController extends AbstractController
             'form' => $form->createView()
         ]);
     }
-
-
 }
